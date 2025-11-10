@@ -1,21 +1,15 @@
-import { Router } from 'express';
-import { getUserProfile, updateUserProfile, deleteUserAccount } from '../controllers/userControllers';
-import { authenticateToken } from '../middleware/checkAuth';
-
+import { Router } from "express";
+import {
+  createUser,
+  getAllUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from "../controllers/userControllers";
 const router = Router();
-
-// All user routes require authentication
-router.use(authenticateToken);
-
-// GET /api/users/:id - Get user profile (own profile or reviewer viewing others)
-router.get('/:id', getUserProfile);
-
-router.get('/', getUserProfile);
-
-// PUT /api/users/:id - Update user profile (only own profile)
-router.put('/:id', updateUserProfile);
-
-// DELETE /api/users/:id - Delete user account (only own account)
-router.delete('/:id', deleteUserAccount);
-
+router.post("/", createUser);
+router.get("/", getAllUsers);
+router.get("/:id", getUserById);
+router.put("/:id", updateUser);
+router.delete("/:id", deleteUser);
 export default router;

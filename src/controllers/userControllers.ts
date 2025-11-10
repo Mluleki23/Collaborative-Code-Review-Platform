@@ -1,125 +1,88 @@
-import { Response } from "express";
-import { findUserById, updateUser, deleteUser } from "../models/userModel";
-import { AuthRequest } from "../middleware/checkAuth";
-
-export const getUserProfile = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+import { Request, Response } from "express";
+import { pool } from "../config/database";
+// Create a new user
+export const createUser = async (req: Request, res: Response) => {
+  const { name, email, password, role } = req.body;
   try {
-    const userId = req.params.id ? parseInt(req.params.id) : req.user?.id;
-
-    if (!userId) {
-      res.status(400).json({ error: "User ID required" });
-      return;
-    }
-
-    const user = await findUserById(userId);
-    if (!user) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    // Users can only view their own profile or reviewers can view any profile
-    if (req.user?.id !== userId && req.user?.role !== "reviewer") {
-      res.status(403).json({ error: "Access denied" });
-      return;
-    }
-
-    res.json({
-      id: user.id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      profile_picture: user.profile_picture,
-      created_at: user.created_at,
-    });
-  } catch (error) {
-    console.error("Get user profile error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    const result = await pool.query(
+      `INSERT INTO users (name, email, password, role)
+       VALUES ($1, $2, $3, $4) RETURNING *`,
+      [name, email, password, role || "submitter"]
+    );
+    res.status(201).json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
-
-export const updateUserProfile = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+// Get all users
+export const getAllUsers = async (_req: Request, res: Response) => {
   try {
-    const userId = parseInt(req.params.id);
-
-    if (!userId) {
-      res.status(400).json({ error: "User ID required" });
-      return;
-    }
-
-    // Users can only update their own profile
-    if (req.user?.id !== userId) {
-      res.status(403).json({ error: "Access denied" });
-      return;
-    }
-
-    const { name, email, role, displayPicture } = req.body;
-    const updates: any = {};
-
-    if (name) updates.name = name;
-    if (email) updates.email = email;
-    if (role && ["reviewer", "submitter"].includes(role)) updates.role = role;
-    if (displayPicture !== undefined) updates.profile_picture = displayPicture;
-
-    if (Object.keys(updates).length === 0) {
-      res.status(400).json({ error: "No valid fields to update" });
-      return;
-    }
-
-    const updatedUser = await updateUser(userId, updates);
-    if (!updatedUser) {
-      res.status(404).json({ error: "User not found" });
-      return;
-    }
-
-    res.json({
-      message: "Profile updated successfully",
-      user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        profile_picture: updatedUser.profile_picture,
-      },
-    });
-  } catch (error) {
-    console.error("Update user profile error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    const result = await pool.query(`SELECT * FROM users ORDER BY id ASC`);
+    res.status(200).json({ success: true, data: result.rows });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
-
-export const deleteUserAccount = async (
-  req: AuthRequest,
-  res: Response
-): Promise<void> => {
+// Get a single user by ID
+export const getUserById = async (req: Request, res: Response) => {
+  const { id } = req.params;
   try {
-    const userId = parseInt(req.params.id);
-
-    if (!userId) {
-      res.status(400).json({ error: "User ID required" });
-      return;
+    const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id]);
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-
-    // Users can only delete their own account
-    if (req.user?.id !== userId) {
-      res.status(403).json({ error: "Access denied" });
-      return;
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+// Delete user
+export const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query(
+      `DELETE FROM users WHERE id = $1 RETURNING *`,
+      [id]
+    );
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-
-    const deleted = await deleteUser(userId);
-    if (!deleted) {
-      res.status(404).json({ error: "User not found" });
-      return;
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+};
+// Update user by ID
+export const updateUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { name, email, role, profile_picture } = req.body;
+  try {
+    const result = await pool.query(
+      `UPDATE users
+       SET name = COALESCE($1, name),
+           email = COALESCE($2, email),
+           role = COALESCE($3, role),
+           profile_picture = COALESCE($4, profile_picture)
+       WHERE id = $5
+       RETURNING *`,
+      [name, email, role, profile_picture, id]
+    );
+    if (result.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
-
-    res.json({ message: "Account deleted successfully" });
-  } catch (error) {
-    console.error("Delete user account error:", error);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(200).json({ success: true, data: result.rows[0] });
+  } catch (err: any) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
