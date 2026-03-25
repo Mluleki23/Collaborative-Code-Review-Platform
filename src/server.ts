@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import submissionRoutes from "./routes/submissionRoute";
 import authRoutes from "./routes/authRoutes";
+import commentRoutes from "./routes/commentRoute";
 const app: Express = express();
 app.use(express.json());
 // Serve static assets
@@ -19,6 +20,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/submissions", submissionRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api", commentRoutes);
+
 // 404 handler
 app.use((request: Request, response: Response, next: NextFunction) => {
   response
