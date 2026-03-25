@@ -2,15 +2,19 @@
 
 
 
----
+Got it — you want this cleaned into **ONE proper README file (no duplication, no repeated sections, no broken formatting)**.
+
+Here is your **final merged and cleaned version** 👇
 
 ---
 
 # 🚀 Collaborative Code Review Platform
 
+![Collaborative Code Review Platform](https://socialify.git.ci/Mluleki23/Collaborative-Code-Review-Platform/image?language=1\&owner=1\&name=1\&stargazers=1\&theme=Light)
+
 ## 📌 Overview
 
-A backend system built with **Node.js** and **TypeScript** for managing projects, submitting code, and collaborating through reviews and comments. It includes secure authentication using JWT and PostgreSQL database integration.
+A backend system built with **Node.js** and **TypeScript** for managing users, projects, code submissions, and reviews. It uses JWT authentication and PostgreSQL for data storage.
 
 ---
 
@@ -18,8 +22,9 @@ A backend system built with **Node.js** and **TypeScript** for managing projects
 
 * 🔐 User authentication (JWT)
 * 🔑 Password hashing (bcrypt)
-* 📂 Project management
-* 💬 Code submissions and comments
+* 👤 User management (CRUD)
+* 📂 Project management (CRUD)
+* 💬 Code submissions & comments (CRUD)
 * 🌐 RESTful API (Express)
 * 🗄️ PostgreSQL database
 
@@ -51,11 +56,10 @@ PORT=4040
 DB_USER=postgres
 DB_HOST=localhost
 DB_DATABASE=code_review_platform
-DB_PASSWORD=Mlule23$@
+DB_PASSWORD=your_password
 DB_PORT=5432
 
-JWT_SECRET=ghhgfghjfytj54557yuuygyu
-
+JWT_SECRET=your_secret_key
 ```
 
 ---
@@ -80,8 +84,8 @@ http://localhost:4040
 src/
 │── config/         # Database config
 │── routes/         # API routes
-│── controllers/    # Logic
-│── middleware/     # Auth & errors
+│── controllers/    # Business logic
+│── middleware/     # Auth & error handling
 │── views/          # HTML
 │── public/         # Static files
 │── app.ts          # Entry point
@@ -140,9 +144,9 @@ Response:
 
 ---
 
-## 🔐 Authorization (IMPORTANT)
+## 🔐 Authorization
 
-For all protected routes, add header:
+For protected routes, include:
 
 ```
 Authorization: Bearer YOUR_JWT_TOKEN
@@ -150,7 +154,42 @@ Authorization: Bearer YOUR_JWT_TOKEN
 
 ---
 
-## 3️⃣ Create Project
+# 👤 USER CRUD
+
+## 📥 Get All Users
+
+**GET** `/api/users`
+
+## 📄 Get Single User
+
+**GET** `/api/users/:id`
+
+Example:
+
+```
+/api/users/1
+```
+
+## ✏️ Update User
+
+**PUT** `/api/users/:id`
+
+```json
+{
+  "name": "Updated Name",
+  "email": "updated@gmail.com"
+}
+```
+
+## ❌ Delete User
+
+**DELETE** `/api/users/:id`
+
+---
+
+# 📂 PROJECT CRUD
+
+## ➕ Create Project
 
 **POST** `/api/projects`
 
@@ -161,36 +200,34 @@ Authorization: Bearer YOUR_JWT_TOKEN
 }
 ```
 
-Response:
-
-```json
-{
-  "id": 1,
-  "title": "Code Review System"
-}
-```
-
----
-
-## 4️⃣ Get All Projects
+## 📥 Get All Projects
 
 **GET** `/api/projects`
 
-Response:
+## 📄 Get Single Project
+
+**GET** `/api/projects/:id`
+
+## ✏️ Update Project
+
+**PUT** `/api/projects/:id`
 
 ```json
-[
-  {
-    "id": 1,
-    "title": "Code Review System",
-    "description": "Platform for reviewing code"
-  }
-]
+{
+  "title": "Updated Project",
+  "description": "Updated description"
+}
 ```
+
+## ❌ Delete Project
+
+**DELETE** `/api/projects/:id`
 
 ---
 
-## 5️⃣ Submit Code
+# 💻 SUBMISSION CRUD
+
+## ➕ Submit Code
 
 **POST** `/api/submissions`
 
@@ -201,60 +238,80 @@ Response:
 }
 ```
 
-Response:
+## 📥 Get All Submissions
+
+**GET** `/api/submissions`
+
+## 📄 Get Single Submission
+
+**GET** `/api/submissions/:id`
+
+## ✏️ Update Submission
+
+**PUT** `/api/submissions/:id`
 
 ```json
 {
-  "id": 1,
-  "projectId": 1,
-  "code": "console.log('Hello World');"
+  "code": "console.log('Updated Code');"
 }
 ```
 
+## ❌ Delete Submission
+
+**DELETE** `/api/submissions/:id`
+
 ---
 
-## 6️⃣ Add Comment (Code Review)
+# 💬 COMMENTS CRUD
+
+## ➕ Add Comment
 
 **POST** `/api/comments`
 
 ```json
 {
   "submissionId": 1,
-  "comment": "Good code, but improve naming."
+  "comment": "Good job, improve naming."
 }
 ```
 
-Response:
+## 📥 Get Comments
+
+**GET** `/api/comments`
+
+## ✏️ Update Comment
+
+**PUT** `/api/comments/:id`
 
 ```json
 {
-  "id": 1,
-  "comment": "Good code, but improve naming."
+  "comment": "Updated review comment"
 }
 ```
 
----
+## ❌ Delete Comment
 
-## 7️⃣ Get Users (Optional)
-
-**GET** `/api/users`
+**DELETE** `/api/comments/:id`
 
 ---
 
 ## ❗ Error Handling
 
-* 401 → Unauthorized (invalid/missing token)
-* 404 → Route not found
-* 500 → Server/Database error
+| Code | Meaning      |
+| ---- | ------------ |
+| 401  | Unauthorized |
+| 404  | Not Found    |
+| 500  | Server Error |
 
 ---
 
 ## 🧪 Testing Tips
 
-* Always **register or login first**
-* Copy the JWT token
-* Add token to headers
-* Use correct IDs (projectId, submissionId)
+* Always register/login first
+* Copy JWT token
+* Add token in headers
+* Use correct IDs
+* Test endpoints step by step
 
 ---
 
@@ -263,4 +320,17 @@ Response:
 Mluleki Moloi
 
 ---
+
+## 📄 License
+
+MIT License
+
+---
+
+If you want next, I can help you:
+
+* Add **badges (build, license, npm, etc.)**
+* Add **Swagger API documentation**
+* Add **Postman collection file**
+* Or make this README look **very professional for GitHub portfolio (recruiter-ready)**
 
