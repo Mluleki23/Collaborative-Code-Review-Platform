@@ -3,6 +3,7 @@ import { error } from "console";
 import express, { Express, Request, NextFunction, Response } from "express";
 import path from "path";
 import { testDBConnection } from "./config/database";
+import { createTablesIfNotExists } from "./services/databaseService";
 import userRoutes from "./routes/userRoutes";
 import projectRoutes from "./routes/projectRoutes";
 import submissionRoutes from "./routes/submissionRoute";
@@ -32,6 +33,7 @@ app.use((request: Request, response: Response, next: NextFunction) => {
 const startServer = async () => {
   try {
     await testDBConnection(); // await the DB connection
+    await createTablesIfNotExists();
     app.listen(process.env.PORT, () => {
       console.log(
         `Application is running on http://localhost:${process.env.PORT}`
